@@ -133,35 +133,21 @@ eyed3.log.setLevel("ERROR")
 #                 treeview.insert('', counter , text=filepath, values=(os.path.basename(filepath), artistName, songName))
 
 
-# def OnDoubleClick(event):
-#     item = treeview.focus()
-#     print(treeview.item(item))
 
-# treeview = ttk.Treeview(mainframe, selectmode='browse')
-# treeview.bind("<Double-1>", OnDoubleClick)
 
-# vsb = ttk.Scrollbar(mainframe, orient="vertical", command=treeview.yview)
-# vsb.grid(column = 2, row=2, sticky=(N,S))
 
-# treeview.configure(yscrollcommand=vsb.set)
-
-# treeview['columns'] = ('name', 'artist', 'title')
-# treeview.heading("#0", text="Sources", anchor='w')
-# treeview.column("#0", anchor='w')
-# treeview.heading('name', text='File Name')
-# treeview.column('name', anchor ='center', width= 100)
-# treeview.heading('artist', text='Artist Tag')
-# treeview.column('artist', anchor ='center', width= 100)
-# treeview.heading('title', text='Title Tag')
-# treeview.column('title', anchor ='center', width= 100)
-# treeview.grid(stick = (N,S,W,E), column = 0, row = 2, columnspan=2)
-# treeview.columnconfigure(0, weight=1)
-# treeview.rowconfigure(0, weight=1)
 
 # populate_btn = ttk.Button(mainframe, text="Populate table", command = lambda:populate())
 # organize_btn = ttk.Button(mainframe, text="Organize music!", command = lambda:organize(workingDirectory_entry.get(), destinationDirectory_entry.get()))
 
 # data = loadData()
+
+'''
+Class : MusicItem
+Info  : Holds data to do with each music file, containing the path, filename and mp3 tags
+'''
+class MusicItem:
+    pass
 
 class Application:
     def __init__(self,master):
@@ -175,6 +161,7 @@ class Application:
         self.mainframe.columnconfigure(0, weight=1)
         self.mainframe.rowconfigure(0, weight=1)
 
+        self.treeView = TreeView(self)
         self.directoryView = DirectoryView(self)
 
         for child in self.mainframe.winfo_children(): child.grid_configure(padx=5, pady=5)
@@ -217,18 +204,18 @@ class DirectoryView:
         self.destinationDirectory = StringVar()
 
         self.workingDirectory_entry = ttk.Entry(self.master.mainframe, width = 120, textvariable = self.workingDirectory)
-        self.workingDirectory_entry.grid(column=0, row=0, sticky=(N,S, W, E))
+        self.workingDirectory_entry.grid(column=0, row=1, sticky=(N,S, W, E))
         self.workingDirectory_entry.columnconfigure(0, weight=1)
         self.workingDirectory_entry.rowconfigure(0, weight=1)
 
         self.chooseWorkingDirectory_btn = ttk.Button(self.master.mainframe, text="Choose working directory", command = lambda:self.chooseWorkingDir())
-        self.chooseWorkingDirectory_btn.grid(column=1, row=0, sticky=(N,E))
+        self.chooseWorkingDirectory_btn.grid(column=1, row=1, sticky=(N,E))
 
         self.destinationDirectory_entry = ttk.Entry(self.master.mainframe, width = 120, textvariable = self.destinationDirectory)
-        self.destinationDirectory_entry.grid(column=0, row=1, sticky=(N,S,W,E))
+        self.destinationDirectory_entry.grid(column=0, row=2, sticky=(N,S,W,E))
 
         self.destinationDirectory_btn = ttk.Button(self.master.mainframe, text="Choose destination", command = lambda:self.chooseDestinationDir())
-        self.destinationDirectory_btn.grid(column=1, row=1, sticky=(N,S,W,E))
+        self.destinationDirectory_btn.grid(column=1, row=2, sticky=(N,S,W,E))
 
     def chooseWorkingDir(self):
         self.workingDirectory = filedialog.askdirectory()
@@ -244,6 +231,35 @@ class DirectoryView:
         # saveData({"workingDirectory" : workingDirectory_entry.get(), "destinationDirectory" : destinationDirectory_entry.get()})
         print("Changed destination directory to : " + self.destinationDirectory)
 
+class TreeView:
+    def __init__(self,master):
+        self.master = master
+
+        self.treeview = ttk.Treeview(self.master.mainframe, selectmode='browse')
+        self.treeview.bind("<Double-1>", self.OnDoubleClick)
+
+        self.vsb = ttk.Scrollbar(self.master.mainframe, orient="vertical", command=self.treeview.yview)
+        self.vsb.grid(column = 2, row=0, sticky=(N,S))
+
+        self.treeview.configure(yscrollcommand=self.vsb.set)
+
+        self.treeview['columns'] = ('name', 'artist', 'title')
+        self.treeview.heading("#0", text="Sources", anchor='w')
+        self.treeview.column("#0", anchor='w')
+        self.treeview.heading('name', text='File Name')
+        self.treeview.column('name', anchor ='center', width= 100)
+        self.treeview.heading('artist', text='Artist Tag')
+        self.treeview.column('artist', anchor ='center', width= 100)
+        self.treeview.heading('title', text='Title Tag')
+        self.treeview.column('title', anchor ='center', width= 100)
+        self.treeview.grid(stick = (N,S,W,E), column = 0, row = 0, columnspan=2)
+        self.treeview.columnconfigure(0, weight=1)
+        self.treeview.rowconfigure(0, weight=1)
+
+    def OnDoubleClick(event):
+        pass
+        # item = treeview.focus()
+        # print(treeview.item(item))
 
 root = Tk()
 
