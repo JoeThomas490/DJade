@@ -156,6 +156,9 @@ class Application:
         master.geometry("1000x500")
         master.protocol("WM_DELETE_WINDOW", self.on_closing)
 
+        self.workingDirectory = StringVar()
+        self.destinationDirectory = StringVar()
+
         self.mainframe = ttk.Frame(root, padding="3 3 12 12")
         self.mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
         self.mainframe.columnconfigure(0, weight=1)
@@ -164,34 +167,21 @@ class Application:
         self.treeView = TreeView(self)
         self.directoryView = DirectoryView(self)
 
+        self.saveManager = SaveManager(self)
+        loadedData = self.saveManager.loadData()
+
+        if loadedData["workingDirectory"] is not "":
+            self.directoryView.workingDirectory_entry.insert(0, loadedData["workingDirectory"])
+        if loadedData["destinationDirectory"] is not "":
+            self.directoryView.destinationDirectory_entry.insert(0, loadedData["destinationDirectory"])
+
+
         for child in self.mainframe.winfo_children(): child.grid_configure(padx=5, pady=5)
-
-    def saveData(self,data):
-        with io.open('data.json', 'w', encoding='utf8') as outfile:
-            str_ = json.dumps(data,
-                          indent=4, sort_keys=True,
-                          separators=(',', ': '), ensure_ascii=False)
-            outfile.write(to_unicode(str_))
-
-    def loadData(self):
-        with open('data.json', 'r', encoding='utf8') as outfile:
-            try:
-                data = json.load(outfile)
-                pprint(data)
-
-                if data["workingDirectory"] is not "":
-                    workingDirectory_entry.insert(0, data["workingDirectory"])
-                if data["destinationDirectory"] is not "":
-                    destinationDirectory_entry.insert(0, data["destinationDirectory"])
-
-            except IOError:
-                print("Data file empty!")
 
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
-            # directories = {"workingDirectory" : workingDirectory_entry.get(), "destinationDirectory" : destinationDirectory_entry.get()}
-            # print(directories)
-            # saveData(directories)
+            directories = {"workingDirectory" : self.directoryView.workingDirectory_entry.get(), "destinationDirectory" : self.directoryView.destinationDirectory_entry.get()}
+            self.saveManager.saveData(directories)
             self.master.destroy()
 
 
@@ -200,10 +190,7 @@ class DirectoryView:
     def __init__(self,master):
         self.master = master
 
-        self.workingDirectory = StringVar()
-        self.destinationDirectory = StringVar()
-
-        self.workingDirectory_entry = ttk.Entry(self.master.mainframe, width = 120, textvariable = self.workingDirectory)
+        self.workingDirectory_entry = ttk.Entry(self.master.mainframe, width = 120, textvariable = self.master.workingDirectory)
         self.workingDirectory_entry.grid(column=0, row=1, sticky=(N,S, W, E))
         self.workingDirectory_entry.columnconfigure(0, weight=1)
         self.workingDirectory_entry.rowconfigure(0, weight=1)
@@ -211,25 +198,23 @@ class DirectoryView:
         self.chooseWorkingDirectory_btn = ttk.Button(self.master.mainframe, text="Choose working directory", command = lambda:self.chooseWorkingDir())
         self.chooseWorkingDirectory_btn.grid(column=1, row=1, sticky=(N,E))
 
-        self.destinationDirectory_entry = ttk.Entry(self.master.mainframe, width = 120, textvariable = self.destinationDirectory)
+        self.destinationDirectory_entry = ttk.Entry(self.master.mainframe, width = 120, textvariable = self.master.destinationDirectory)
         self.destinationDirectory_entry.grid(column=0, row=2, sticky=(N,S,W,E))
 
         self.destinationDirectory_btn = ttk.Button(self.master.mainframe, text="Choose destination", command = lambda:self.chooseDestinationDir())
         self.destinationDirectory_btn.grid(column=1, row=2, sticky=(N,S,W,E))
 
     def chooseWorkingDir(self):
-        self.workingDirectory = filedialog.askdirectory()
+        self.master.workingDirectory = filedialog.askdirectory()
         self.workingDirectory_entry.delete(0, END)
-        self.workingDirectory_entry.insert(0, self.workingDirectory)
-        # saveData({"workingDirectory" : workingDirectory_entry.get(), "destinationDirectory" : destinationDirectory_entry.get()})
-        print ("Changed working directory to : " + self.workingDirectory)
+        self.workingDirectory_entry.insert(0, self.master.workingDirectory)
+        print ("Changed working directory to : " + self.master.workingDirectory)
 
     def chooseDestinationDir(self):
-        self.destinationDirectory = filedialog.askdirectory()
+        self.master.destinationDirectory = filedialog.askdirectory()
         self.destinationDirectory_entry.delete(0,END)
-        self.destinationDirectory_entry.insert(0, self.destinationDirectory)
-        # saveData({"workingDirectory" : workingDirectory_entry.get(), "destinationDirectory" : destinationDirectory_entry.get()})
-        print("Changed destination directory to : " + self.destinationDirectory)
+        self.destinationDirectory_entry.insert(0, self.master.destinationDirectory)
+        print("Changed destination directory to : " + self.master.destinationDirectory)
 
 class TreeView:
     def __init__(self,master):
@@ -260,6 +245,27 @@ class TreeView:
         pass
         # item = treeview.focus()
         # print(treeview.item(item))
+
+class SaveManager:
+    def __init__(self, master):
+        self.master = master
+
+    def saveData(self,data):
+        with io.open('data.json', 'w', encoding='utf8') as outfile:
+            str_ = json.dumps(data,
+                          indent=4, sort_keys=True,
+                          separators=(',', ': '), ensure_ascii=False)
+            outfile.write(to_unicode(str_))
+
+    def loadData(self):
+        with open('data.json', 'r', encoding='utf8') as outfile:
+            try:
+                data = json.load(outfile)
+                return data
+
+            except IOError:
+                print("Data file empty!")
+
 
 root = Tk()
 
