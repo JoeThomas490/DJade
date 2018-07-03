@@ -1,5 +1,9 @@
 from tkinter import *
 from tkinter import ttk, filedialog, messagebox
+from tkinter.messagebox import showinfo
+
+import tkinter as tk
+
 
 from pprint import pprint
 
@@ -104,38 +108,6 @@ eyed3.log.setLevel("ERROR")
 #         print(errorMsg)
 #     treeview.delete(*treeview.get_children())
 
-# def populate():
-#     treeview.delete(*treeview.get_children())
-#     fileList = []
-#     audioFileList = []
-#     counter = 0
-#     for subdir, dirs, files in os.walk(workingDirectory_entry.get()):
-#         for file in files:
-#             filepath = subdir + os.sep + file
-#             if(filepath.endswith(".mp3")):
-#                 fileList.append(filepath)
-#                 try:
-#                     print("Loading file : " + filepath)
-#                     audiofile = eyed3.load(filepath)
-#                     audioFileList.append(audiofile)
-#                 except IOError:
-#                     print("Cannot find file!")
-#                     raise
-
-#                 artistName = ""
-#                 songName = ""
-
-#                 if audiofile is not None:
-#                     if audiofile.tag is not None:
-#                         artistName = audiofile.tag.artist
-#                         songName = audiofile.tag.title
-
-#                 treeview.insert('', counter , text=filepath, values=(os.path.basename(filepath), artistName, songName))
-
-
-
-
-
 
 # organize_btn = ttk.Button(mainframe, text="Organize music!", command = lambda:organize(workingDirectory_entry.get(), destinationDirectory_entry.get()))
 
@@ -178,6 +150,9 @@ class Application:
         if self.destinationDirectory is not "":
             self.directoryView.destinationDirectory_entry.insert(0, self.destinationDirectory)
 
+        self.populateBtn = ttk.Button(self.mainframe, text="Populate Table", command = lambda:self.treeView.Populate())
+        self.organizeBtn = ttk.Button(self.mainframe, text="Organize Music", command = lambda:self.Organize())
+
 
         for child in self.mainframe.winfo_children(): child.grid_configure(padx=5, pady=5)
 
@@ -186,6 +161,9 @@ class Application:
             directories = {"workingDirectory" : self.directoryView.workingDirectory_entry.get(), "destinationDirectory" : self.directoryView.destinationDirectory_entry.get()}
             self.saveManager.saveData(directories)
             self.master.destroy()
+
+    def Organize(self):
+        pass
 
 
 
@@ -244,12 +222,34 @@ class TreeView:
         self.treeview.columnconfigure(0, weight=1)
         self.treeview.rowconfigure(0, weight=1)
 
-        self.populateBtn = ttk.Button(self.master.mainframe, text="Populate table", command = lambda:self.Populate())
+    def OnDoubleClick(self,event):
+        item = self.treeview.item(self.treeview.focus())
+        print(item)
 
-    def OnDoubleClick(event):
-        pass
-        # item = treeview.focus()
-        # print(treeview.item(item))
+        columnNum = self.treeview.identify_column(event.x)[1]
+
+        selectedItem = item["values"][int(columnNum)-1]
+        print(selectedItem)
+
+        win = tk.Toplevel()
+        win.wm_title("Edit Tag")
+
+        tagLbl = tk.Label(win, text="Tag")
+        tagLbl.grid(row=0, column=0)
+
+        tagEntry = tk.Entry(win)
+        tagEntry.grid(row=0, column=1)
+        tagEntry.delete(0,END)
+        tagEntry.insert(0, selectedItem)
+
+        for child in win.winfo_children(): child.grid_configure(padx=5, pady=5)
+
+
+        confirmBtn = ttk.Button(win, text="Confirm", command=win.destroy)
+        confirmBtn.grid(row=1, column=0)
+
+        cancelBtn = ttk.Button(win, text="Cancel", command=win.destroy)
+        cancelBtn.grid(row=1, column= 1)
 
     def ClearTreeView(self):
         self.treeview.delete(*self.treeview.get_children())
@@ -259,6 +259,7 @@ class TreeView:
         fileList = []
         audioFileList = []
         counter = 0
+
         for subdir, dirs, files in os.walk(self.master.workingDirectory):
             for file in files:
                 filepath = subdir + os.sep + file
