@@ -137,7 +137,6 @@ eyed3.log.setLevel("ERROR")
 
 
 
-# populate_btn = ttk.Button(mainframe, text="Populate table", command = lambda:populate())
 # organize_btn = ttk.Button(mainframe, text="Organize music!", command = lambda:organize(workingDirectory_entry.get(), destinationDirectory_entry.get()))
 
 # data = loadData()
@@ -168,12 +167,16 @@ class Application:
         self.directoryView = DirectoryView(self)
 
         self.saveManager = SaveManager(self)
+
         loadedData = self.saveManager.loadData()
 
-        if loadedData["workingDirectory"] is not "":
-            self.directoryView.workingDirectory_entry.insert(0, loadedData["workingDirectory"])
-        if loadedData["destinationDirectory"] is not "":
-            self.directoryView.destinationDirectory_entry.insert(0, loadedData["destinationDirectory"])
+        self.workingDirectory = loadedData["workingDirectory"]
+        self.destinationDirectory = loadedData["destinationDirectory"]
+
+        if self.workingDirectory is not "":
+            self.directoryView.workingDirectory_entry.insert(0, self.workingDirectory)
+        if self.destinationDirectory is not "":
+            self.directoryView.destinationDirectory_entry.insert(0, self.destinationDirectory)
 
 
         for child in self.mainframe.winfo_children(): child.grid_configure(padx=5, pady=5)
@@ -241,10 +244,45 @@ class TreeView:
         self.treeview.columnconfigure(0, weight=1)
         self.treeview.rowconfigure(0, weight=1)
 
+        self.populateBtn = ttk.Button(self.master.mainframe, text="Populate table", command = lambda:self.Populate())
+
     def OnDoubleClick(event):
         pass
         # item = treeview.focus()
         # print(treeview.item(item))
+
+    def ClearTreeView(self):
+        self.treeview.delete(*self.treeview.get_children())
+
+    def Populate(self):
+        self.ClearTreeView()
+        fileList = []
+        audioFileList = []
+        counter = 0
+        for subdir, dirs, files in os.walk(self.master.workingDirectory):
+            for file in files:
+                filepath = subdir + os.sep + file
+                if(filepath.endswith(".mp3")):
+                    fileList.append(filepath)
+                    try:
+                        print("Loading file : " + filepath)
+                        audiofile = eyed3.load(filepath)
+                        audioFileList.append(audiofile)
+                    except IOError:
+                        print("Cannot find file!")
+                        raise
+
+                    artistName = ""
+                    songName = ""
+
+                    if audiofile is not None:
+                        if audiofile.tag is not None:
+                            artistName = audiofile.tag.artist
+                            songName = audiofile.tag.title
+
+                    self.treeview.insert('', counter , text=filepath, values=(os.path.basename(filepath), artistName, songName))
+
+
 
 class SaveManager:
     def __init__(self, master):
