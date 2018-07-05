@@ -38,6 +38,8 @@ class Application:
         self.workingDirectory = StringVar()
         self.destinationDirectory = StringVar()
 
+        self.audioFileList = {}
+
         self.mainframe = ttk.Frame(root, padding="3 3 12 12")
         self.mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
         self.mainframe.columnconfigure(0, weight=1)
@@ -80,11 +82,11 @@ class Application:
 
         for subdir, dirs, files in os.walk(workingDirectory):
             for file in files:
-                filepath = subdir + os.sep + file
-                if(filepath.endswith(".mp3")):
+                filePath = subdir + os.sep + file
+                if(filePath.endswith(".mp3")):
                     try:
-                        print("Loading file : " + filepath)
-                        audiofile = eyed3.load(filepath)
+                        print("Loading file : " + filePath)
+                        audiofile = eyed3.load(filePath)
                     except IOError:
                         print("Cannot find file!")
                         raise
@@ -99,7 +101,7 @@ class Application:
 
                                 songName = audiofile.tag.title
 
-                                splicedPath = filepath.replace(file, "")
+                                splicedPath = filePath.replace(file, "")
                                 newName = artistName + " - " + songName
                                 for char in '.?!/;:_"':  
                                     newName = newName.replace(char,'')
@@ -107,7 +109,7 @@ class Application:
                                 newName = newName + ".mp3"  
 
                                 renamedPath = splicedPath + newName
-                                os.rename(filepath, renamedPath)
+                                os.rename(filePath, renamedPath)
                                 print("Renamed file to " + newName)
 
                                 try:
@@ -208,49 +210,67 @@ class TreeView:
 
     def OnDoubleClick(self,event):
         item = self.treeview.item(self.treeview.focus())
-        print(item)
-
-        columnNum = self.treeview.identify_column(event.x)[1]
-
         if item["values"] is "":
             return
 
+        columnNum = self.treeview.identify_column(event.x)[1]
+        columnNum = int(columnNum)
+
+        if columnNum is not 2 and columnNum is not 3:
+            return
+
         selectedItem = item["values"][int(columnNum)-1]
-        print(selectedItem)
 
         if self.treeviewPopup is None:
-            self.treeviewPopup = TreeViewPopup(self, selectedItem)
-        else:
-            print("Popup is already active!")
+            self.treeviewPopup = TreeViewPopup(self, item["values"][0],selectedItem,columnNum)
 
     def DeletePopup(self):
         self.treeviewPopup.window.destroy()
         self.treeviewPopup = None
+
+    def ConfirmPopupEntry(self, fileName, columnNum, entry):
+        print(fileName)
+        print(columnNum)
+        print(entry)
+
+        audioFile = self.master.audioFileList[fileName]
+        #Change ARTIST tag
+        if columnNum is 2:
+            print("Changing artist tag")
+            audioFile.tag.artist = entry
+        #Change TITLE tag
+        if columnNum is 3:
+            audioFile.tag.title = entry
+
+        self.DeletePopup()
+
+
+        audioFile.tag.save(version=(2,3,0))
+        # audioFile.tag.save()
+
+        self.Populate()
         
 
     def ClearTreeView(self):
         self.treeview.delete(*self.treeview.get_children())
+        self.master.audioFileList.clear()
 
     def Populate(self):
         
         self.ClearTreeView()
-
-        fileList = []
-        audioFileList = []
         counter = 0
 
         for subdir, dirs, files in os.walk(self.master.workingDirectory):
             for file in files:
 
-                filepath = subdir + os.sep + file
+                filePath = subdir + os.sep + file
 
-                if(filepath.endswith(".mp3")):
-                    fileList.append(filepath)
-
+                if(filePath.endswith(".mp3")):
+                    fileName = os.path.basename(filePath).split(".mp3")[0]
                     try:
-                        print("Loading file : " + filepath)
-                        audiofile = eyed3.load(filepath)
-                        audioFileList.append(audiofile)
+                        print("Loading file : " + filePath)
+                        audioFile = eyed3.load(filePath)
+                        self.master.audioFileList[fileName] = audioFile
 
                     except IOError:
                         print("Cannot find file!")
@@ -259,18 +279,19 @@ class TreeView:
                     artistName = StringVar()
                     songName = StringVar()
 
-                    if audiofile is not None:
-                        if audiofile.tag is not None:
-                            artistName = audiofile.tag.artist
-                            songName = audiofile.tag.title
+                    if audioFile is not None:
+                        if audioFile.tag is not None:
+                            artistName = audioFile.tag.artist
+                            songName = audioFile.tag.title
 
-                    fileName = os.path.basename(filepath).split(".mp3")[0]
+                   
 
-                    self.treeview.insert('', counter , text=filepath, values=(fileName, artistName, songName))
+                    self.treeview.insert('', counter , text=filePath, values=(fileName, artistName, songName))
 
+        print(self.master.audioFileList)
 
 class TreeViewPopup:
-    def __init__(self, master, selectedItem):
+    def __init__(self, master, fileName, selectedItem,columnNum):
 
         self.master = master
 
@@ -289,7 +310,7 @@ class TreeViewPopup:
         self.tagEntry.delete(0,END)
         self.tagEntry.insert(0, selectedItem)
 
-        self.confirmBtn = ttk.Button(self.window, text="Confirm", command=lambda:self.master.DeletePopup())
+        self.confirmBtn = ttk.Button(self.window, text="Confirm", command=lambda:self.master.ConfirmPopupEntry(fileName, columnNum, self.tagEntry.get()))
         self.confirmBtn.grid(row=1, column=0, sticky=(S,W))
 
         self.cancelBtn = ttk.Button(self.window, text="Cancel", command=lambda:self.master.DeletePopup())
