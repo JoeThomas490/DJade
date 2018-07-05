@@ -183,6 +183,8 @@ class TreeView:
     def __init__(self,master):
         self.master = master
 
+        self.treeviewPopup = None
+
         self.treeview = ttk.Treeview(self.master.mainframe, selectmode='browse')
         self.treeview.bind("<Double-1>", self.OnDoubleClick)
 
@@ -216,8 +218,15 @@ class TreeView:
         selectedItem = item["values"][int(columnNum)-1]
         print(selectedItem)
 
-        self.entryPopup = TreeViewPopup(self, selectedItem)
+        if self.treeviewPopup is None:
+            self.treeviewPopup = TreeViewPopup(self, selectedItem)
+        else:
+            print("Popup is already active!")
 
+    def DeletePopup(self):
+        self.treeviewPopup.window.destroy()
+        self.treeviewPopup = None
+        
 
     def ClearTreeView(self):
         self.treeview.delete(*self.treeview.get_children())
@@ -263,6 +272,8 @@ class TreeView:
 class TreeViewPopup:
     def __init__(self, master, selectedItem):
 
+        self.master = master
+
         self.window = tk.Toplevel()
         self.window.wm_title("Edit Tag")
 
@@ -274,10 +285,10 @@ class TreeViewPopup:
         self.tagEntry.delete(0,END)
         self.tagEntry.insert(0, selectedItem)
 
-        self.confirmBtn = ttk.Button(self.window, text="Confirm", command=self.window.destroy)
+        self.confirmBtn = ttk.Button(self.window, text="Confirm", command=lambda:self.master.DeletePopup())
         self.confirmBtn.grid(row=1, column=0)
 
-        self.cancelBtn = ttk.Button(self.window, text="Cancel", command=self.window.destroy)
+        self.cancelBtn = ttk.Button(self.window, text="Cancel", command=lambda:self.master.DeletePopup())
         self.cancelBtn.grid(row=1, column= 1)        
 
         for child in self.window.winfo_children(): child.grid_configure(padx=5, pady=5)
