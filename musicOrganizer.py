@@ -229,24 +229,21 @@ class TreeView:
         self.treeviewPopup = None
 
     def ConfirmPopupEntry(self, fileName, columnNum, entry):
-        print(fileName)
-        print(columnNum)
-        print(entry)
 
         audioFile = self.master.audioFileList[fileName]
+
         #Change ARTIST tag
         if columnNum is 2:
             print("Changing artist tag")
             audioFile.tag.artist = entry
+
         #Change TITLE tag
         if columnNum is 3:
             audioFile.tag.title = entry
 
         self.DeletePopup()
 
-
         audioFile.tag.save(version=(2,3,0))
-        # audioFile.tag.save()
 
         self.Populate()
         
@@ -298,6 +295,7 @@ class TreeViewPopup:
         self.window = tk.Toplevel()
         self.window.wm_title("Edit Tag")
         self.window.wm_attributes("-topmost",1)
+
         self.window.protocol("WM_DELETE_WINDOW", self.master.DeletePopup)
 
         self.window.geometry("%dx%d%+d%+d" % (300, 100, 150, 250))
@@ -309,6 +307,7 @@ class TreeViewPopup:
         self.tagEntry.grid(row=0, column=1, sticky=(N,E))
         self.tagEntry.delete(0,END)
         self.tagEntry.insert(0, selectedItem)
+        self.tagEntry.focus_set()
 
         self.confirmBtn = ttk.Button(self.window, text="Confirm", command=lambda:self.master.ConfirmPopupEntry(fileName, columnNum, self.tagEntry.get()))
         self.confirmBtn.grid(row=1, column=0, sticky=(S,W))
@@ -318,6 +317,7 @@ class TreeViewPopup:
 
         for child in self.window.winfo_children(): child.grid_configure(padx=5, pady=5)
 
+        self.window.bind("<Return>", (lambda event:self.master.ConfirmPopupEntry(fileName, columnNum, self.tagEntry.get())))
 
 class SaveManager:
     def __init__(self, master):
