@@ -276,6 +276,7 @@ class TreeViewPopup:
 
         self.window = tk.Toplevel()
         self.window.wm_title("Edit Tag")
+        self.window.wm_attributes("-topmost",1)
 
         self.tagLbl = tk.Label(self.window, text="Tag")
         self.tagLbl.grid(row=0, column=0)
