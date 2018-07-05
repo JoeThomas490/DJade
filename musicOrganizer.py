@@ -34,6 +34,7 @@ class Application:
         self.master.title("Music Organizer")
         self.master.geometry("1000x500")
         self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.master.bind("<Escape>", (lambda event: self.on_closing()))
 
         self.workingDirectory = StringVar()
         self.destinationDirectory = StringVar()
@@ -245,7 +246,9 @@ class TreeView:
 
         audioFile.tag.save(version=(2,3,0))
 
-        self.Populate()
+        # self.treeview.insert('', counter , text=filePath, values=(fileName, artistName, songName))
+
+        # self.Populate()
         
 
     def ClearTreeView(self):
