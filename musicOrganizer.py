@@ -108,11 +108,6 @@ eyed3.log.setLevel("ERROR")
 #         print(errorMsg)
 #     treeview.delete(*treeview.get_children())
 
-
-# organize_btn = ttk.Button(mainframe, text="Organize music!", command = lambda:organize(workingDirectory_entry.get(), destinationDirectory_entry.get()))
-
-# data = loadData()
-
 '''
 Class : MusicItem
 Info  : Holds data to do with each music file, containing the path, filename and mp3 tags
@@ -228,61 +223,77 @@ class TreeView:
 
         columnNum = self.treeview.identify_column(event.x)[1]
 
+        if item["values"] is "":
+            return
+
         selectedItem = item["values"][int(columnNum)-1]
         print(selectedItem)
 
-        win = tk.Toplevel()
-        win.wm_title("Edit Tag")
+        self.entryPopup = TreeViewPopup(self, selectedItem)
 
-        tagLbl = tk.Label(win, text="Tag")
-        tagLbl.grid(row=0, column=0)
-
-        tagEntry = tk.Entry(win)
-        tagEntry.grid(row=0, column=1)
-        tagEntry.delete(0,END)
-        tagEntry.insert(0, selectedItem)
-
-        for child in win.winfo_children(): child.grid_configure(padx=5, pady=5)
-
-
-        confirmBtn = ttk.Button(win, text="Confirm", command=win.destroy)
-        confirmBtn.grid(row=1, column=0)
-
-        cancelBtn = ttk.Button(win, text="Cancel", command=win.destroy)
-        cancelBtn.grid(row=1, column= 1)
 
     def ClearTreeView(self):
         self.treeview.delete(*self.treeview.get_children())
 
     def Populate(self):
+        
         self.ClearTreeView()
+
         fileList = []
         audioFileList = []
         counter = 0
 
         for subdir, dirs, files in os.walk(self.master.workingDirectory):
             for file in files:
+
                 filepath = subdir + os.sep + file
+
                 if(filepath.endswith(".mp3")):
                     fileList.append(filepath)
+
                     try:
                         print("Loading file : " + filepath)
                         audiofile = eyed3.load(filepath)
                         audioFileList.append(audiofile)
+
                     except IOError:
                         print("Cannot find file!")
                         raise
 
-                    artistName = ""
-                    songName = ""
+                    artistName = StringVar()
+                    songName = StringVar()
 
                     if audiofile is not None:
                         if audiofile.tag is not None:
                             artistName = audiofile.tag.artist
                             songName = audiofile.tag.title
 
-                    self.treeview.insert('', counter , text=filepath, values=(os.path.basename(filepath), artistName, songName))
+                    fileName = os.path.basename(filepath).split(".mp3")[0]
 
+                    self.treeview.insert('', counter , text=filepath, values=(fileName, artistName, songName))
+
+
+class TreeViewPopup:
+    def __init__(self, master, selectedItem):
+
+        self.window = tk.Toplevel()
+        self.window.wm_title("Edit Tag")
+
+        self.tagLbl = tk.Label(self.window, text="Tag")
+        self.tagLbl.grid(row=0, column=0)
+
+        self.tagEntry = tk.Entry(self.window)
+        self.tagEntry.grid(row=0, column=1)
+        self.tagEntry.delete(0,END)
+        self.tagEntry.insert(0, selectedItem)
+
+        self.confirmBtn = ttk.Button(self.window, text="Confirm", command=self.window.destroy)
+        self.confirmBtn.grid(row=1, column=0)
+
+        self.cancelBtn = ttk.Button(self.window, text="Cancel", command=self.window.destroy)
+        self.cancelBtn.grid(row=1, column= 1)        
+
+        for child in self.window.winfo_children(): child.grid_configure(padx=5, pady=5)
 
 
 class SaveManager:
@@ -305,9 +316,6 @@ class SaveManager:
             except IOError:
                 print("Data file empty!")
 
-
 root = Tk()
-
 app = Application(root)
-
 root.mainloop()
