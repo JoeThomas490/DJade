@@ -31,9 +31,9 @@ class MusicItem:
 class Application:
     def __init__(self,master):
         self.master = master
-        master.title("Music Organizer")
-        master.geometry("1000x500")
-        master.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.master.title("Music Organizer")
+        self.master.geometry("1000x500")
+        self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
 
         self.workingDirectory = StringVar()
         self.destinationDirectory = StringVar()
@@ -277,20 +277,23 @@ class TreeViewPopup:
         self.window = tk.Toplevel()
         self.window.wm_title("Edit Tag")
         self.window.wm_attributes("-topmost",1)
+        self.window.protocol("WM_DELETE_WINDOW", self.master.DeletePopup)
+
+        self.window.geometry("%dx%d%+d%+d" % (300, 100, 150, 250))
 
         self.tagLbl = tk.Label(self.window, text="Tag")
         self.tagLbl.grid(row=0, column=0)
 
         self.tagEntry = tk.Entry(self.window)
-        self.tagEntry.grid(row=0, column=1)
+        self.tagEntry.grid(row=0, column=1, sticky=(N,E))
         self.tagEntry.delete(0,END)
         self.tagEntry.insert(0, selectedItem)
 
         self.confirmBtn = ttk.Button(self.window, text="Confirm", command=lambda:self.master.DeletePopup())
-        self.confirmBtn.grid(row=1, column=0)
+        self.confirmBtn.grid(row=1, column=0, sticky=(S,W))
 
         self.cancelBtn = ttk.Button(self.window, text="Cancel", command=lambda:self.master.DeletePopup())
-        self.cancelBtn.grid(row=1, column= 1)        
+        self.cancelBtn.grid(row=1, column= 1, sticky=(S,E))        
 
         for child in self.window.winfo_children(): child.grid_configure(padx=5, pady=5)
 
