@@ -33,7 +33,7 @@ class MusicItem:
     pass
 
 class Application:
-    def __init__(self,master):
+     def __init__(self,master):
         self.master = master
         self.master.title("Music Organizer")
         self.master.geometry("1000x500")
