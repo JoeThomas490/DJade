@@ -78,7 +78,6 @@ class Application:
             self.master.destroy()
 
     def Organize(self):
-        return
 
         workingDirectory = self.workingDirectory
         print("Current working directory : " + workingDirectory)
@@ -93,69 +92,46 @@ class Application:
                 if(filePath.endswith(".mp3")):
                     try:
                         print("Loading file : " + filePath)
-                        audiofile = eyed3.load(filePath)
+                        audioFile = ID3(filePath)
                     except IOError:
                         print("Cannot find file!")
                         raise
-                    if audiofile is not None:
-                        if audiofile.tag is not None:
-                            if audiofile.tag.artist is not None and audiofile.tag.title is not None:
-                                artistNameTag = audiofile.tag.artist
+                    if audioFile is not None:
+                        if "TIT2" in audioFile and "TPE1" in audioFile:
 
-                                artistNameTag = artistNameTag.split("/")
-                                artistName = ""
-                                artistName = artistNameTag[0]
+                            artistNameTag = str(audioFile["TPE1"])
+                            artistNameTag = artistNameTag.split("/")
+                            artistName = ""
+                            artistName = artistNameTag[0]
 
-                                songName = audiofile.tag.title
+                            songName = str(audioFile["TIT2"])
 
-                                splicedPath = filePath.replace(file, "")
-                                newName = artistName + " - " + songName
-                                for char in '.?!/;:_"':  
-                                    newName = newName.replace(char,'')
+                            splicedPath = filePath.replace(file, "")
+                            newName = artistName + " - " + songName
+                            for char in '.?!/;:_"':  
+                                newName = newName.replace(char,'')
 
-                                newName = newName + ".mp3"  
+                            newName = newName + ".mp3"  
 
-                                renamedPath = splicedPath + newName
-                                os.rename(filePath, renamedPath)
-                                print("Renamed file to " + newName)
+                            renamedPath = splicedPath + newName
+                            os.rename(filePath, renamedPath)
+                            print("Renamed file to " + newName)
 
-                                try:
-                                    os.mkdir(destinationDirectory + "\\" + artistName)
-                                    print("Making directory for " + artistName)
-                                except OSError:
-                                    print("Directory " + artistName + " already exists!")
-                                    if not os.path.isdir(destinationDirectory + "\\" + artistName):
-                                        raise
+                            try:
+                                os.mkdir(destinationDirectory + "\\" + artistName)
+                                print("Making directory for " + artistName)
+                            except OSError:
+                                print("Directory " + artistName + " already exists!")
+                                if not os.path.isdir(destinationDirectory + "\\" + artistName):
+                                    raise
 
-                                destinationPath = destinationDirectory + "\\" + artistName + "\\" + newName
-                                print("Moving file to : " + destinationPath)
+                            destinationPath = destinationDirectory + "\\" + artistName + "\\" + newName
+                            print("Moving file to : " + destinationPath)
 
-                                shutil.move(renamedPath, destinationPath)
-
-                                successCount = successCount + 1
-                            else:
-                                print("Couldn't find artist or title !")
-                                errorCount = errorCount + 1
-                        else:
-                            print("Song doesn't have tags attached!")
-                            errorCount = errorCount + 1
+                            shutil.move(renamedPath, destinationPath)
                     else:
                         print("File wasn't loaded properly!")
                         errorCount = errorCount + 1
-
-        # try:
-        #     os.rmdir(workingDirectory + "\\" + "downloading")
-        # except OSError:
-        #      print ("'Downloading' folder already deleted!")
-
-        # if errorCount == 0:
-        #     print("Success!")
-        # else:
-        #     errorMsg = "Error! {0} file(s) couldn't be organized!".format(errorCount)
-        #     print(errorMsg)
-        #     treeview.delete(*treeview.get_children())
-        #     pass
-
 
 
 class DirectoryView:
@@ -260,7 +236,7 @@ class TreeView:
         self.DeletePopup()
 
         audioFile.save()
-        
+
         # self.treeview.insert('', counter , text=filePath, values=(fileName, artistName, songName))
         self.Populate()
         
