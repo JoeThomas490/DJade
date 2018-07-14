@@ -171,13 +171,23 @@ class DirectoryView:
         self.destinationDirectory_btn.grid(column=1, row=2, sticky=(N,S,W,E))
 
     def chooseWorkingDir(self):
-        self.master.workingDirectory = filedialog.askdirectory()
+        newWorkingDir = filedialog.askdirectory()
+
+        if newWorkingDir is "":
+            return
+
+        self.master.workingDirectory = newWorkingDir
         self.workingDirectory_entry.delete(0, END)
         self.workingDirectory_entry.insert(0, self.master.workingDirectory)
         print ("Changed working directory to : " + self.master.workingDirectory)
 
     def chooseDestinationDir(self):
-        self.master.destinationDirectory = filedialog.askdirectory()
+        newDestinationDir = filedialog.askdirectory()
+
+        if newDestinationDir is "":
+            return
+
+        self.master.destinationDirectory = newDestinationDir
         self.destinationDirectory_entry.delete(0,END)
         self.destinationDirectory_entry.insert(0, self.master.destinationDirectory)
         print("Changed destination directory to : " + self.master.destinationDirectory)
@@ -235,7 +245,6 @@ class TreeView:
 
         #Change ARTIST tag
         if columnNum is 2:
-            print("Changing artist tag")
             audioFile.tag.artist = entry
 
         #Change TITLE tag
@@ -287,8 +296,6 @@ class TreeView:
                    
 
                     self.treeview.insert('', counter , text=filePath, values=(fileName, artistName, songName))
-
-        print(self.master.audioFileList)
 
 class TreeViewPopup:
     def __init__(self, master, fileName, selectedItem,columnNum):
