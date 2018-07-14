@@ -228,18 +228,18 @@ class TreeView:
         #Change ARTIST tag
         if columnNum is 2:
             audioFile["TPE1"] = TPE1(encoding=3, text=entry)
+            title = self.treeview.item(fileName)["values"][2]
+            self.treeview.item(fileName, values=(fileName, entry, title))
 
         #Change TITLE tag
         if columnNum is 3:
             audioFile["TIT2"] = TIT2(encoding=3, text=entry)
+            artist = self.treeview.item(fileName)["values"][1]
+            self.treeview.item(fileName, values=(fileName, artist, entry))
 
         self.DeletePopup()
 
         audioFile.save()
-
-        # self.treeview.insert('', counter , text=filePath, values=(fileName, artistName, songName))
-        self.Populate()
-        
 
     def ClearTreeView(self):
         self.treeview.delete(*self.treeview.get_children())
@@ -282,7 +282,7 @@ class TreeView:
 
                    
 
-                    self.treeview.insert('', counter , text=filePath, values=(fileName, artistName, songName))
+                    self.treeview.insert('', 'end', fileName, text=filePath, values=(fileName, artistName, songName))
 
 class TreeViewPopup:
     def __init__(self, master, fileName, selectedItem,columnNum):
