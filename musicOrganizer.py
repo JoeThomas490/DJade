@@ -12,6 +12,10 @@ import os
 import shutil
 import json
 
+import mutagen
+from mutagen.mp3 import MP3
+from mutagen.id3 import ID3, TIT2, TPE1
+
 import io
 
 try:
@@ -74,6 +78,8 @@ class Application:
             self.master.destroy()
 
     def Organize(self):
+        return
+
         workingDirectory = self.workingDirectory
         print("Current working directory : " + workingDirectory)
         errorCount = 0
@@ -245,19 +251,18 @@ class TreeView:
 
         #Change ARTIST tag
         if columnNum is 2:
-            audioFile.tag.artist = entry
+            audioFile["TPE1"] = TPE1(encoding=3, text=entry)
 
         #Change TITLE tag
         if columnNum is 3:
-            audioFile.tag.title = entry
+            audioFile["TIT2"] = TIT2(encoding=3, text=entry)
 
         self.DeletePopup()
 
-        audioFile.tag.save(version=(2,3,0))
-
+        audioFile.save()
+        
         # self.treeview.insert('', counter , text=filePath, values=(fileName, artistName, songName))
-
-        # self.Populate()
+        self.Populate()
         
 
     def ClearTreeView(self):
@@ -278,7 +283,7 @@ class TreeView:
                     fileName = os.path.basename(filePath).split(".mp3")[0]
                     try:
                         print("Loading file : " + filePath)
-                        audioFile = eyed3.load(filePath)
+                        audioFile = ID3(filePath)
                         self.master.audioFileList[fileName] = audioFile
 
                     except IOError:
@@ -289,9 +294,15 @@ class TreeView:
                     songName = StringVar()
 
                     if audioFile is not None:
-                        if audioFile.tag is not None:
-                            artistName = audioFile.tag.artist
-                            songName = audioFile.tag.title
+                        if "TPE1" in audioFile:
+                            artistName = audioFile["TPE1"]
+                        else:
+                            artistName = "None"
+
+                        if "TIT2" in audioFile:
+                            songName = audioFile["TIT2"]
+                        else:
+                            songName = "None"
 
                    
 
