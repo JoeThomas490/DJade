@@ -26,9 +26,9 @@ class TreeView:
 
         self.treeview['columns'] = ('name', 'artist', 'title')
         self.treeview.heading("#0", text="Sources", anchor='w')
-        self.treeview.column("#0", anchor='w')
+        self.treeview.column("#0", anchor='w', minwidth = 0, width = 1)
         self.treeview.heading('name', text='File Name')
-        self.treeview.column('name', anchor ='center', width= 100)
+        self.treeview.column('name', anchor ='center', width= 200)
         self.treeview.heading('artist', text='Artist Tag')
         self.treeview.column('artist', anchor ='center', width= 100)
         self.treeview.heading('title', text='Title Tag')
