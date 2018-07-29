@@ -10,6 +10,9 @@ import mutagen
 from mutagen.mp3 import MP3
 from mutagen.id3 import ID3, TIT2, TPE1, TCON
 
+from src import AudioItem
+from pprint import pprint
+
 class TreeView:
     def __init__(self,master):
         self.master = master
@@ -99,7 +102,6 @@ class TreeView:
                     try:
                         print("Loading file : " + filePath)
                         audioFile = ID3(filePath)
-                        self.master.audioFileList[fileName] = audioFile
 
                     except IOError:
                         print("Cannot find file!")
@@ -125,9 +127,13 @@ class TreeView:
                         else:
                             genreName = "None"
 
-                   
+                    audioItem = AudioItem.AudioItem(self, filePath, fileName, artistName, songName, genreName)
+                    
+                    self.master.audioFileList.append(audioItem)
 
                     self.treeview.insert('', 'end', fileName, text=filePath, values=(fileName, artistName, songName, genreName))
+
+        print[audioItem.titleTag for audioItem in self.master.audioFileList]
 
 class TreeViewPopup:
     def __init__(self, master, fileName, selectedItem,columnNum):

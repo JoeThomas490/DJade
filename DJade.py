@@ -15,6 +15,7 @@ Import src modules
 from src import TreeView
 from src import SaveManager
 from src import DirectoryView
+from src import AudioItem
 
 '''
 Import system modules
@@ -38,13 +39,6 @@ from mutagen.id3 import ID3, TIT2, TPE1
 END IMPORT
 '''
 
-'''
-Class : MusicItem
-Info  : Holds data to do with each music file, containing the path, filename and mp3 tags
-'''
-class MusicItem:
-    pass
-
 class Application:
     def __init__(self,master):
         self.master = master
@@ -56,7 +50,7 @@ class Application:
         self.workingDirectory = StringVar()
         self.destinationDirectory = StringVar()
 
-        self.audioFileList = {}
+        self.audioFileList = []
 
         self.mainframe = ttk.Frame(root, padding="3 3 12 12")
         self.mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
@@ -145,6 +139,7 @@ class Application:
                     else:
                         print("File wasn't loaded properly!")
                         errorCount = errorCount + 1
+
 
 root = Tk()
 app = Application(root)
