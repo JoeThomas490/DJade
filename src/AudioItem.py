@@ -1,5 +1,5 @@
 class AudioItem:
-    def __init__(self,master, source, fileName, audioFile, artistTag, titleTag, genreTag):
+    def __init__(self, master, source, fileName, audioFile, artistTag, titleTag, genreTag):
 
         self.source = source
         self.fileName = fileName
@@ -15,13 +15,12 @@ class AudioItem:
 
     @property
     def artistTag(self):
-        return self.__artistTag.text[0]
+        return self.__artistTag
 
     @property
     def titleTag(self):
-        return self.__titleTag.text[0]
+        return self.__titleTag
 
     @property
     def genreTag(self):
-        print(self.__genreTag)
         return self.__genreTag
