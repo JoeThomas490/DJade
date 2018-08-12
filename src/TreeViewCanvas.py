@@ -10,18 +10,20 @@ class TreeViewCanvas:
 
         self.InitSelectCanvas(self.fgCol, self.bgCol)
 
-        self.master.bind('<Double-1>', self.SelectItem)
+        self.master.treeview.bind('<Double-1>', self.SelectItem)
 
     def InitSelectCanvas(self, fgCol, bgCol):
         self._font = tkFont.Font()
 
         self._canvas = tk.Canvas(
-            self.master, background=bgCol, borderwidth=0)
+            self.master.treeview, background=bgCol, borderwidth=0)
 
         self._canvas.text = self._canvas.create_text(
             0, 0, fill=fgCol, anchor='w')
 
     def SelectItem(self, event):
+
+        self.master.OnDoubleClick(event)
 
         # Remove canvas from GUI
         self._canvas.place_forget()

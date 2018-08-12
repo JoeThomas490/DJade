@@ -25,7 +25,7 @@ class TreeView:
         self.treeview = ttk.Treeview(
             self.master.mainframe, selectmode='extended')
 
-        self.canvas = TreeViewCanvas(self.treeview)
+        self.canvas = TreeViewCanvas(self)
 
         # self.treeview.bind("<Double-1>", self.OnDoubleClick)
         # self.treeview.bind("<Double-1>", self.SelectItem)
@@ -91,7 +91,7 @@ class TreeView:
         self.treeviewPopup.window.destroy()
         self.treeviewPopup = None
 
-        self._canvas.place_forget()
+        self.canvas._canvas.place_forget()
 
     def ConfirmPopupEntry(self, fileName, columnNum, entry):
 
