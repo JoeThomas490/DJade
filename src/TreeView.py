@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk, filedialog, messagebox
 from tkinter.messagebox import showinfo
+import tkinter.font as tkFont
 
 import tkinter as tk
 
@@ -22,7 +23,9 @@ class TreeView:
 
         self.treeview = ttk.Treeview(
             self.master.mainframe, selectmode='extended')
-        self.treeview.bind("<Double-1>", self.OnDoubleClick)
+
+        # self.treeview.bind("<Double-1>", self.OnDoubleClick)
+        self.treeview.bind("<Double-1>", self.SelectItem)
 
         self.vsb = ttk.Scrollbar(
             self.master.mainframe, orient="vertical", command=self.treeview.yview)
@@ -46,7 +49,71 @@ class TreeView:
         self.treeview.columnconfigure(0, weight=1)
         self.treeview.rowconfigure(0, weight=1)
 
+        fgCol = '#ecffc4'
+        bgCol = '#05640e'
+        self.InitSelectCanvas(fgCol, bgCol)
+
+    def InitSelectCanvas(self, fgCol, bgCol):
+        self._font = tkFont.Font()
+        self._canvas = tk.Canvas(
+            self.treeview, background=bgCol, borderwidth=0)
+        self._canvas.text = self._canvas.create_text(
+            0, 0, fill=fgCol, anchor='w')
+
+        # self._canvas.bind("<Double-1>", self.OnDoubleClick)
+
+    def SelectItem(self, event):
+        self.OnDoubleClick(event)
+
+        # Remove canvas from GUI
+        self._canvas.place_forget()
+
+        x, y, widget = event.x, event.y, event.widget
+
+        item = widget.item(widget.focus())
+        itemText = item['text']
+        itemValues = item['values']
+        iid = widget.identify_row(y)
+        column = widget.identify_column(x)
+
+        # If selection is not on valid treeview item
+        if not iid or not column:
+            return
+
+        # If selected item doesn't have any values
+        if not len(itemValues):
+            return
+
+        if column == '#0' or column == '#1':
+            return
+
+        bbox = widget.bbox(iid, column)
+        print(bbox)
+
+        cellVal = itemValues[int(column[1])-1]
+
+        self.ShowSelectionCanvas(widget, bbox, column, cellVal)
+
+    def ShowSelectionCanvas(self, parent, bbox, column, cellVal):
+        x, y, width, height = bbox
+
+        textw = self._font.measure(cellVal)
+
+        self._canvas.configure(width=width, height=height)
+
+        # Position canvas-textbox in Canvas
+        self._canvas.coords(self._canvas.text,
+                            15,
+                            height*0.5)
+
+        # Update value of canvas-textbox with the value of the selected cell.
+        self._canvas.itemconfigure(self._canvas.text, text=cellVal)
+
+        # Overlay Canvas over Treeview cell
+        self._canvas.place(in_=parent, x=x, y=y-2)
+
     def OnDoubleClick(self, event):
+
         item = self.treeview.item(self.treeview.focus())
         if item["values"] is "":
             return
@@ -66,6 +133,8 @@ class TreeView:
     def DeletePopup(self):
         self.treeviewPopup.window.destroy()
         self.treeviewPopup = None
+
+        self._canvas.place_forget()
 
     def ConfirmPopupEntry(self, fileName, columnNum, entry):
 
@@ -154,8 +223,6 @@ class TreeView:
                         self, filePath, fileName, audioFile, artistName, songName, genreName)
 
                     self.master.audioFileList[fileName] = audioItem
-
-                    print(audioItem.artistTag)
 
                     self.treeview.insert('', 'end', fileName, text=filePath, values=(
                         fileName, artistName, songName, genreName))

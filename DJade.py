@@ -29,7 +29,7 @@ import io
 
 '''
 Import mutagen library
-''' 
+'''
 
 import mutagen
 from mutagen.mp3 import MP3
@@ -39,8 +39,9 @@ from mutagen.id3 import ID3, TIT2, TPE1
 END IMPORT
 '''
 
+
 class Application:
-    def __init__(self,master):
+    def __init__(self, master):
         self.master = master
         self.master.title("DJade")
         self.master.geometry("1000x500")
@@ -68,19 +69,24 @@ class Application:
         self.destinationDirectory = loadedData["destinationDirectory"]
 
         if self.workingDirectory is not "":
-            self.directoryView.workingDirectory_entry.insert(0, self.workingDirectory)
+            self.directoryView.workingDirectory_entry.insert(
+                0, self.workingDirectory)
         if self.destinationDirectory is not "":
-            self.directoryView.destinationDirectory_entry.insert(0, self.destinationDirectory)
+            self.directoryView.destinationDirectory_entry.insert(
+                0, self.destinationDirectory)
 
-        self.populateBtn = ttk.Button(self.mainframe, text="Populate Table", command = lambda:self.treeView.Populate())
-        self.organizeBtn = ttk.Button(self.mainframe, text="Organize Music", command = lambda:self.Organize())
+        self.populateBtn = ttk.Button(
+            self.mainframe, text="Populate Table", command=lambda: self.treeView.Populate())
+        self.organizeBtn = ttk.Button(
+            self.mainframe, text="Organize Music", command=lambda: self.Organize())
 
-
-        for child in self.mainframe.winfo_children(): child.grid_configure(padx=5, pady=5)
+        for child in self.mainframe.winfo_children():
+            child.grid_configure(padx=5, pady=5)
 
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
-            directories = {"workingDirectory" : self.directoryView.workingDirectory_entry.get(), "destinationDirectory" : self.directoryView.destinationDirectory_entry.get()}
+            directories = {"workingDirectory": self.directoryView.workingDirectory_entry.get(
+            ), "destinationDirectory": self.directoryView.destinationDirectory_entry.get()}
             self.saveManager.saveData(directories)
             self.master.destroy()
 
@@ -115,20 +121,22 @@ class Application:
 
                             splicedPath = filePath.replace(file, "")
                             newName = artistName + " - " + songName
-                            for char in '.?!/;:_"':  
-                                newName = newName.replace(char,'')
+                            for char in '.?!/;:_"':
+                                newName = newName.replace(char, '')
 
-                            newName = newName + ".mp3"  
+                            newName = newName + ".mp3"
 
                             renamedPath = splicedPath + newName
                             os.rename(filePath, renamedPath)
                             print("Renamed file to " + newName)
 
                             try:
-                                os.mkdir(destinationDirectory + "\\" + artistName)
+                                os.mkdir(destinationDirectory +
+                                         "\\" + artistName)
                                 print("Making directory for " + artistName)
                             except OSError:
-                                print("Directory " + artistName + " already exists!")
+                                print("Directory " + artistName +
+                                      " already exists!")
                                 if not os.path.isdir(destinationDirectory + "\\" + artistName):
                                     raise
 
@@ -141,6 +149,7 @@ class Application:
                         errorCount = errorCount + 1
 
 
-root = Tk()
-app = Application(root)
-root.mainloop()
+if __name__ == "__main__":
+    root = Tk()
+    app = Application(root)
+    root.mainloop()
