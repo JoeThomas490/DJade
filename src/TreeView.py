@@ -21,7 +21,7 @@ class TreeView:
         self.treeviewPopup = None
 
         self.treeview = ttk.Treeview(
-            self.master.mainframe, selectmode='browse')
+            self.master.mainframe, selectmode='extended')
         self.treeview.bind("<Double-1>", self.OnDoubleClick)
 
         self.vsb = ttk.Scrollbar(
@@ -183,8 +183,8 @@ class TreeViewPopup:
         self.tagEntry.insert(0, selectedItem)
         self.tagEntry.focus_set()
 
-        #Dropdown menu test
-        
+        # Dropdown menu test
+
         # self.optionMenuVar = StringVar()
         # self.optionMenu = ttk.OptionMenu(
         #     self.window, self.optionMenuVar, 'one', 'two', 'three')
