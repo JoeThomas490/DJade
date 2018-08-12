@@ -52,22 +52,28 @@ class TreeView:
         self.treeview.columnconfigure(0, weight=1)
         self.treeview.rowconfigure(0, weight=1)
 
-        # self.popupMenu = tk.Menu(self.treeview, tearoff=0)
-        # self.popupMenu.add_command(
-        #     label="Menu Test", command=lambda: self.testMenu("MENU TEST 1"))
-        # self.popupMenu.add_separator()
-        # self.popupMenu.add_command(
-        #     label="Menu Test2", command=lambda: self.testMenu("MENU TEST 2"))
-        # self.treeview.bind("<Button-3>", self.popup)
+        self.popupMenu = tk.Menu(self.treeview, tearoff=0)
+        self.popupMenu.add_command(
+            label="Menu Test", command=lambda: self.testMenu("MENU TEST 1"))
+        self.popupMenu.add_separator()
+        self.popupMenu.add_command(
+            label="Menu Test2", command=lambda: self.testMenu("MENU TEST 2"))
+        self.treeview.bind("<Button-3>", self.popup)
 
-    # def testMenu(self, text):
-    #     print(text)
+    def testMenu(self, text):
+        print(self.selectedItems)
+        self.OnDoubleClick()
 
-    # def popup(self, event):
-    #     try:
-    #         self.popupMenu.tk_popup(event.x_root + 60, event.y_root + 10, 0)
-    #     finally:
-    #         self.popupMenu.grab_release()
+    def popup(self, event):
+
+        self.selectedItems = event.widget.selection()
+        if not len(self.selectedItems):
+            return
+
+        try:
+            self.popupMenu.tk_popup(event.x_root + 60, event.y_root + 10, 0)
+        finally:
+            self.popupMenu.grab_release()
 
     def OnDoubleClick(self, event):
 
