@@ -29,7 +29,7 @@ import io
 
 '''
 Import mutagen library
-'''
+''' 
 
 import mutagen
 from mutagen.mp3 import MP3
@@ -50,7 +50,7 @@ class Application:
         self.workingDirectory = StringVar()
         self.destinationDirectory = StringVar()
 
-        self.audioFileList = []
+        self.audioFileList = {}
 
         self.mainframe = ttk.Frame(root, padding="3 3 12 12")
         self.mainframe.grid(column=0, row=0, sticky=(N, W, E, S))

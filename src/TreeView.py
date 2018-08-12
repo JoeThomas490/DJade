@@ -65,19 +65,26 @@ class TreeView:
 
     def ConfirmPopupEntry(self, fileName, columnNum, entry):
 
-        audioFile = self.master.audioFileList[fileName]
+        audioItem = self.master.audioFileList[fileName]
+        audioFile = audioItem.audioFile
+
+        title = audioItem.titleTag
+        artist = audioItem.artistTag
+        genre = audioItem.genreTag
 
         #Change ARTIST tag
         if columnNum is 2:
             audioFile["TPE1"] = TPE1(encoding=3, text=entry)
-            title = self.treeview.item(fileName)["values"][2]
-            self.treeview.item(fileName, values=(fileName, entry, title))
+            self.treeview.item(fileName, values=(fileName, entry, title, genre))
+            audioItem.artist = entry
+            print(self.master.audioFileList[fileName].artist)
 
         #Change TITLE tag
         if columnNum is 3:
             audioFile["TIT2"] = TIT2(encoding=3, text=entry)
             artist = self.treeview.item(fileName)["values"][1]
-            self.treeview.item(fileName, values=(fileName, artist, entry))
+            self.treeview.item(fileName, values=(fileName, artist, entry, genre))
+            audioItem.title = entry
 
         self.DeletePopup()
 
@@ -127,13 +134,12 @@ class TreeView:
                         else:
                             genreName = "None"
 
-                    audioItem = AudioItem.AudioItem(self, filePath, fileName, artistName, songName, genreName)
+                    audioItem = AudioItem.AudioItem(self, filePath, fileName, audioFile, artistName, songName, genreName)
                     
-                    self.master.audioFileList.append(audioItem)
+                    self.master.audioFileList[fileName] = audioItem
 
-                    self.treeview.insert('', 'end', fileName, text=filePath, values=(fileName, artistName, songName, genreName))
+                    self.treeview.insert('', 'end', fileName, text=filePath, values=(fileName, artistName, songName, genreName))                   
 
-        print[audioItem.titleTag for audioItem in self.master.audioFileList]
 
 class TreeViewPopup:
     def __init__(self, master, fileName, selectedItem,columnNum):
