@@ -49,9 +49,26 @@ class TreeView:
         self.treeview.columnconfigure(0, weight=1)
         self.treeview.rowconfigure(0, weight=1)
 
+        self.popupMenu = tk.Menu(self.treeview, tearoff=0)
+        self.popupMenu.add_command(
+            label="Menu Test", command=lambda: self.testMenu("MENU TEST 1"))
+        self.popupMenu.add_separator()
+        self.popupMenu.add_command(
+            label="Menu Test2", command=lambda: self.testMenu("MENU TEST 2"))
+        self.treeview.bind("<Button-3>", self.popup)
+
         fgCol = '#ecffc4'
         bgCol = '#05640e'
         self.InitSelectCanvas(fgCol, bgCol)
+
+    def testMenu(self, text):
+        print(text)
+
+    def popup(self, event):
+        try:
+            self.popupMenu.tk_popup(event.x_root + 60, event.y_root + 10, 0)
+        finally:
+            self.popupMenu.grab_release()
 
     def InitSelectCanvas(self, fgCol, bgCol):
         self._font = tkFont.Font()
@@ -59,8 +76,6 @@ class TreeView:
             self.treeview, background=bgCol, borderwidth=0)
         self._canvas.text = self._canvas.create_text(
             0, 0, fill=fgCol, anchor='w')
-
-        # self._canvas.bind("<Double-1>", self.OnDoubleClick)
 
     def SelectItem(self, event):
         self.OnDoubleClick(event)
@@ -96,8 +111,6 @@ class TreeView:
 
     def ShowSelectionCanvas(self, parent, bbox, column, cellVal):
         x, y, width, height = bbox
-
-        textw = self._font.measure(cellVal)
 
         self._canvas.configure(width=width, height=height)
 
