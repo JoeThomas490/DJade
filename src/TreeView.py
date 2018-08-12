@@ -62,7 +62,6 @@ class TreeView:
 
     def testMenu(self, text):
         print(self.selectedItems)
-        self.OnDoubleClick()
 
     def popup(self, event):
 
