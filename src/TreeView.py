@@ -12,6 +12,7 @@ from mutagen.mp3 import MP3
 from mutagen.id3 import ID3, TIT2, TPE1, TCON
 
 from src import AudioItem
+from src.TreeViewCanvas import TreeViewCanvas
 from pprint import pprint
 
 
@@ -24,8 +25,10 @@ class TreeView:
         self.treeview = ttk.Treeview(
             self.master.mainframe, selectmode='extended')
 
+        self.canvas = TreeViewCanvas(self.treeview)
+
         # self.treeview.bind("<Double-1>", self.OnDoubleClick)
-        self.treeview.bind("<Double-1>", self.SelectItem)
+        # self.treeview.bind("<Double-1>", self.SelectItem)
 
         self.vsb = ttk.Scrollbar(
             self.master.mainframe, orient="vertical", command=self.treeview.yview)
@@ -49,81 +52,22 @@ class TreeView:
         self.treeview.columnconfigure(0, weight=1)
         self.treeview.rowconfigure(0, weight=1)
 
-        self.popupMenu = tk.Menu(self.treeview, tearoff=0)
-        self.popupMenu.add_command(
-            label="Menu Test", command=lambda: self.testMenu("MENU TEST 1"))
-        self.popupMenu.add_separator()
-        self.popupMenu.add_command(
-            label="Menu Test2", command=lambda: self.testMenu("MENU TEST 2"))
-        self.treeview.bind("<Button-3>", self.popup)
+        # self.popupMenu = tk.Menu(self.treeview, tearoff=0)
+        # self.popupMenu.add_command(
+        #     label="Menu Test", command=lambda: self.testMenu("MENU TEST 1"))
+        # self.popupMenu.add_separator()
+        # self.popupMenu.add_command(
+        #     label="Menu Test2", command=lambda: self.testMenu("MENU TEST 2"))
+        # self.treeview.bind("<Button-3>", self.popup)
 
-        fgCol = '#ecffc4'
-        bgCol = '#05640e'
-        self.InitSelectCanvas(fgCol, bgCol)
+    # def testMenu(self, text):
+    #     print(text)
 
-    def testMenu(self, text):
-        print(text)
-
-    def popup(self, event):
-        try:
-            self.popupMenu.tk_popup(event.x_root + 60, event.y_root + 10, 0)
-        finally:
-            self.popupMenu.grab_release()
-
-    def InitSelectCanvas(self, fgCol, bgCol):
-        self._font = tkFont.Font()
-        self._canvas = tk.Canvas(
-            self.treeview, background=bgCol, borderwidth=0)
-        self._canvas.text = self._canvas.create_text(
-            0, 0, fill=fgCol, anchor='w')
-
-    def SelectItem(self, event):
-        self.OnDoubleClick(event)
-
-        # Remove canvas from GUI
-        self._canvas.place_forget()
-
-        x, y, widget = event.x, event.y, event.widget
-
-        item = widget.item(widget.focus())
-        itemText = item['text']
-        itemValues = item['values']
-        iid = widget.identify_row(y)
-        column = widget.identify_column(x)
-
-        # If selection is not on valid treeview item
-        if not iid or not column:
-            return
-
-        # If selected item doesn't have any values
-        if not len(itemValues):
-            return
-
-        if column == '#0' or column == '#1':
-            return
-
-        bbox = widget.bbox(iid, column)
-        print(bbox)
-
-        cellVal = itemValues[int(column[1])-1]
-
-        self.ShowSelectionCanvas(widget, bbox, column, cellVal)
-
-    def ShowSelectionCanvas(self, parent, bbox, column, cellVal):
-        x, y, width, height = bbox
-
-        self._canvas.configure(width=width, height=height)
-
-        # Position canvas-textbox in Canvas
-        self._canvas.coords(self._canvas.text,
-                            15,
-                            height*0.5)
-
-        # Update value of canvas-textbox with the value of the selected cell.
-        self._canvas.itemconfigure(self._canvas.text, text=cellVal)
-
-        # Overlay Canvas over Treeview cell
-        self._canvas.place(in_=parent, x=x, y=y-2)
+    # def popup(self, event):
+    #     try:
+    #         self.popupMenu.tk_popup(event.x_root + 60, event.y_root + 10, 0)
+    #     finally:
+    #         self.popupMenu.grab_release()
 
     def OnDoubleClick(self, event):
 
@@ -140,7 +84,7 @@ class TreeView:
         selectedItem = item["values"][int(columnNum)-1]
 
         if self.treeviewPopup is None:
-            self.treeviewPopup = TreeViewPopup(
+            self.treeviewPopup = TreeViewEntryPopup(
                 self, item["values"][0], selectedItem, columnNum)
 
     def DeletePopup(self):
@@ -241,7 +185,7 @@ class TreeView:
                         fileName, artistName, songName, genreName))
 
 
-class TreeViewPopup:
+class TreeViewEntryPopup:
     def __init__(self, master, fileName, selectedItem, columnNum):
 
         self.master = master
