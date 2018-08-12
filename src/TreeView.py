@@ -183,6 +183,13 @@ class TreeViewPopup:
         self.tagEntry.insert(0, selectedItem)
         self.tagEntry.focus_set()
 
+        #Dropdown menu test
+        
+        # self.optionMenuVar = StringVar()
+        # self.optionMenu = ttk.OptionMenu(
+        #     self.window, self.optionMenuVar, 'one', 'two', 'three')
+        # self.optionMenu.grid(row=0, column=2)
+
         self.confirmBtn = ttk.Button(self.window, text="Confirm", command=lambda: self.master.ConfirmPopupEntry(
             fileName, columnNum, self.tagEntry.get()))
         self.confirmBtn.grid(row=1, column=0, sticky=(S, W))
