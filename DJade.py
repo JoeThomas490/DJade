@@ -200,13 +200,16 @@ class Application:
                             shutil.move(renamedPath, destinationPath)
 
                             successCount = successCount + 1
+                        else:
+                            print("No tags found on file")
+                            errorCount = errorCount + 1
                     else:
                         print("File wasn't loaded properly!")
                         errorCount = errorCount + 1
 
         print("Files moved : ", successCount)
         print("Errors : ", errorCount)
-        print("Success rate:", totalFiles / successCount)
+        # print("Success rate:", totalFiles / successCount)
 
 
 if __name__ == "__main__":

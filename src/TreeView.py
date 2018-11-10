@@ -114,6 +114,12 @@ class TreeView:
             self.treeview.item(fileName, values=(
                 fileName, entry, title, genre))
 
+            if self.treeview.item(fileName)['tags'][0] == 'error':
+                if entry != 'None' and entry != '':
+                    self.treeview.item(fileName, tags=("ready"))
+                else:
+                    self.treeview.item(fileName, tags=("error"))
+
             audioItem.artist = entry
 
         # Change TITLE tag
@@ -135,6 +141,8 @@ class TreeView:
             audioItem.genre = entry
 
         self.DeletePopup()
+
+        self.master.audioFileList[fileName] = audioItem
 
         audioFile.save()
 
@@ -186,8 +194,14 @@ class TreeView:
 
                     self.master.audioFileList[fileName] = audioItem
 
-                    self.treeview.insert('', 'end', fileName, text=filePath, values=(
-                        fileName, artistName, songName, genreName))
+                    if artistName == "None":
+                        self.treeview.insert('', 'end', fileName, text=filePath, values=(
+                            fileName, artistName, songName, genreName), tags=('error'))
+                    else:
+                        self.treeview.insert('', 'end', fileName, text=filePath, values=(
+                            fileName, artistName, songName, genreName), tags=('ready'))
+
+        self.treeview.tag_configure('error', background="red")
 
 
 class TreeViewEntryPopup:
