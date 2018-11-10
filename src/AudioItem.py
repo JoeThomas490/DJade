@@ -17,10 +17,23 @@ class AudioItem:
     def artistTag(self):
         return self.__artistTag
 
+    @artistTag.setter
+    def artistTag(self, value):
+        print(value)
+        self.__artistTag = value
+
     @property
     def titleTag(self):
         return self.__titleTag
 
+    @titleTag.setter
+    def titleTag(self, value):
+        self.__titleTag = value
+
     @property
     def genreTag(self):
         return self.__genreTag
+
+    @genreTag.setter
+    def genreTag(self, value):
+        self.__genreTag = value

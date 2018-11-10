@@ -120,7 +120,7 @@ class TreeView:
                 else:
                     self.treeview.item(fileName, tags=("error"))
 
-            audioItem.artist = entry
+            audioItem.artistTag = entry
 
         # Change TITLE tag
         if columnNum is 3:
@@ -129,7 +129,7 @@ class TreeView:
             self.treeview.item(fileName, values=(
                 fileName, artist, entry, genre))
 
-            audioItem.title = entry
+            audioItem.titleTag = entry
 
         # Change GENRE tag
         if columnNum is 4:
@@ -138,12 +138,9 @@ class TreeView:
             self.treeview.item(fileName, values=(
                 fileName, artist, title, entry))
 
-            audioItem.genre = entry
+            audioItem.genreTag = entry
 
         self.DeletePopup()
-
-        self.master.audioFileList[fileName] = audioItem
-
         audioFile.save()
 
     def ClearTreeView(self):
