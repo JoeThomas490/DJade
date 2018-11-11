@@ -209,6 +209,8 @@ class Application:
 
         print("Files moved : ", successCount)
         print("Errors : ", errorCount)
+
+        self.treeView.Populate()
         # print("Success rate:", totalFiles / successCount)
 
 

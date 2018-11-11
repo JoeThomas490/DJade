@@ -19,7 +19,6 @@ class AudioItem:
 
     @artistTag.setter
     def artistTag(self, value):
-        print(value)
         self.__artistTag = value
 
     @property

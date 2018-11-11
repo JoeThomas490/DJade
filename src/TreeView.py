@@ -76,21 +76,34 @@ class TreeView:
 
     def OnDoubleClick(self, event):
 
+        # Get the current focussed item
         item = self.treeview.item(self.treeview.focus())
+
+        # If this item has no values then return
+        # out of the function early
         if item["values"] is "":
             return
 
-        columnNum = self.treeview.identify_column(event.x)[1]
-        columnNum = int(columnNum)
+        # Get the current column number
+        columnNum = int(self.treeview.identify_column(event.x)[1])
 
+        # If we've not selected a valid column
+        # return out of this function early
         if columnNum is not 2 and columnNum is not 3 and columnNum is not 4:
             return
 
         selectedItem = item["values"][int(columnNum)-1]
+        fileName = item["values"][0]
+
+        selectedItems = self.treeview.selection()
+        print(selectedItems)
+
+        # itemGroup = self.treeview.item(selectedItem[0])
+        # print(itemGroup)
 
         if self.treeviewPopup is None:
             self.treeviewPopup = TreeViewEntryPopup(
-                self, item["values"][0], selectedItem, columnNum)
+                self, fileName, selectedItem, columnNum, selectedItems)
 
     def DeletePopup(self):
         self.treeviewPopup.window.destroy()
@@ -98,50 +111,52 @@ class TreeView:
 
         self.canvas._canvas.place_forget()
 
-    def ConfirmPopupEntry(self, fileName, columnNum, entry):
+    def ConfirmPopupEntry(self, columnNum, entry, fileNames):
 
-        audioItem = self.master.audioFileList[fileName]
-        audioFile = audioItem.audioFile
+        for fileName in fileNames:
 
-        title = audioItem.titleTag
-        artist = audioItem.artistTag
-        genre = audioItem.genreTag
+            audioItem = self.master.audioFileList[fileName]
+            audioFile = audioItem.audioFile
 
-        # Change ARTIST tag
-        if columnNum is 2:
-            audioFile["TPE1"] = TPE1(encoding=3, text=entry)
+            title = audioItem.titleTag
+            artist = audioItem.artistTag
+            genre = audioItem.genreTag
 
-            self.treeview.item(fileName, values=(
-                fileName, entry, title, genre))
+            # Change ARTIST tag
+            if columnNum is 2:
+                audioFile["TPE1"] = TPE1(encoding=3, text=entry)
 
-            if self.treeview.item(fileName)['tags'][0] == 'error':
-                if entry != 'None' and entry != '':
-                    self.treeview.item(fileName, tags=("ready"))
-                else:
-                    self.treeview.item(fileName, tags=("error"))
+                self.treeview.item(fileName, values=(
+                    fileName, entry, title, genre))
 
-            audioItem.artistTag = entry
+                if self.treeview.item(fileName)['tags'][0] == 'error':
+                    if entry != 'None' and entry != '':
+                        self.treeview.item(fileName, tags=("ready"))
+                    else:
+                        self.treeview.item(fileName, tags=("error"))
 
-        # Change TITLE tag
-        if columnNum is 3:
-            audioFile["TIT2"] = TIT2(encoding=3, text=entry)
+                audioItem.artistTag = entry
 
-            self.treeview.item(fileName, values=(
-                fileName, artist, entry, genre))
+            # Change TITLE tag
+            if columnNum is 3:
+                audioFile["TIT2"] = TIT2(encoding=3, text=entry)
 
-            audioItem.titleTag = entry
+                self.treeview.item(fileName, values=(
+                    fileName, artist, entry, genre))
 
-        # Change GENRE tag
-        if columnNum is 4:
-            audioFile["TCON"] = TCON(encoding=3, text=entry)
+                audioItem.titleTag = entry
 
-            self.treeview.item(fileName, values=(
-                fileName, artist, title, entry))
+            # Change GENRE tag
+            if columnNum is 4:
+                audioFile["TCON"] = TCON(encoding=3, text=entry)
 
-            audioItem.genreTag = entry
+                self.treeview.item(fileName, values=(
+                    fileName, artist, title, entry))
 
+                audioItem.genreTag = entry
+
+            audioFile.save()
         self.DeletePopup()
-        audioFile.save()
 
     def ClearTreeView(self):
         self.treeview.delete(*self.treeview.get_children())
@@ -202,7 +217,7 @@ class TreeView:
 
 
 class TreeViewEntryPopup:
-    def __init__(self, master, fileName, selectedItem, columnNum):
+    def __init__(self, master, fileName, selectedItem, columnNum, selectedItems):
 
         self.master = master
 
@@ -231,7 +246,7 @@ class TreeViewEntryPopup:
         # self.optionMenu.grid(row=0, column=2)
 
         self.confirmBtn = ttk.Button(self.window, text="Confirm", command=lambda: self.master.ConfirmPopupEntry(
-            fileName, columnNum, self.tagEntry.get()))
+            columnNum, self.tagEntry.get(), selectedItems))
         self.confirmBtn.grid(row=1, column=0, sticky=(S, W))
 
         self.cancelBtn = ttk.Button(
@@ -242,4 +257,4 @@ class TreeViewEntryPopup:
             child.grid_configure(padx=5, pady=5)
 
         self.window.bind("<Return>", (lambda event: self.master.ConfirmPopupEntry(
-            fileName, columnNum, self.tagEntry.get())))
+            columnNum, self.tagEntry.get(), selectedItems)))
