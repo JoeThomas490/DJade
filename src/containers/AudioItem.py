@@ -1,5 +1,7 @@
 class AudioItem:
-    def __init__(self, master, source, fileName, audioFile, artistTag, titleTag, genreTag):
+    def __init__(self, master, rowNum, source, fileName, audioFile, artistTag, titleTag, genreTag):
+
+        self.__rowNum = rowNum
 
         self.source = source
         self.fileName = fileName
@@ -36,3 +38,7 @@ class AudioItem:
     @genreTag.setter
     def genreTag(self, value):
         self.__genreTag = value
+
+    @property
+    def rowNum(self):
+        return self.__rowNum
