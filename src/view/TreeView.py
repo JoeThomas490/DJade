@@ -166,6 +166,8 @@ class TreeView:
 
         self.ClearTreeView()
 
+        count = 1
+
         for subdir, dirs, files in os.walk(self.master.workingDirectory):
             for file in files:
 
@@ -206,14 +208,32 @@ class TreeView:
 
                     self.master.audioFileList[fileName] = audioItem
 
-                    if artistName == "None":
-                        self.treeview.insert('', 'end', fileName, text=filePath, values=(
-                            fileName, artistName, songName, genreName), tags=('error'))
+                    if count % 2 is 0:
+                        if artistName == "None":
+                            self.treeview.insert('', 'end', fileName, text=filePath, values=(
+                                fileName, artistName, songName, genreName), tags=('even', 'error'))
+                        else:
+                            self.treeview.insert('', 'end', fileName, text=filePath, values=(
+                                fileName, artistName, songName, genreName), tags=('even', 'ready'))
                     else:
-                        self.treeview.insert('', 'end', fileName, text=filePath, values=(
-                            fileName, artistName, songName, genreName), tags=('ready'))
+                        if artistName == "None":
+                            self.treeview.insert('', 'end', fileName, text=filePath, values=(
+                                fileName, artistName, songName, genreName), tags=('error', 'odd'))
+                        else:
+                            self.treeview.insert('', 'end', fileName, text=filePath, values=(
+                                fileName, artistName, songName, genreName), tags=('odd', 'ready'))
 
-        self.treeview.tag_configure('error', background="red")
+                    count = count + 1
+
+                    # if artistName == "None":
+                    #     self.treeview.insert('', 'end', fileName, text=filePath, values=(
+                    #         fileName, artistName, songName, genreName), tags=('error'))
+                    # else:
+                    #     self.treeview.insert('', 'end', fileName, text=filePath, values=(
+                    #         fileName, artistName, songName, genreName), tags=('ready'))
+
+        self.treeview.tag_configure('odd', background="alice blue")
+        self.treeview.tag_configure('error', background="red2")
 
 
 class TreeViewEntryPopup:
