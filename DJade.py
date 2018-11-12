@@ -12,10 +12,10 @@ import tkinter as tk
 '''
 Import src modules
 '''
-from src import TreeView
 from src import SaveManager
-from src import DirectoryView
-from src import AudioItem
+from src.view import TreeView
+from src.view import DirectoryView
+from src.containers import AudioItem
 
 '''
 Import system modules

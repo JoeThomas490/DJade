@@ -11,8 +11,8 @@ import mutagen
 from mutagen.mp3 import MP3
 from mutagen.id3 import ID3, TIT2, TPE1, TCON
 
-from src import AudioItem
-from src.TreeViewCanvas import TreeViewCanvas
+from src.containers import AudioItem
+from src.view.TreeViewCanvas import TreeViewCanvas
 from pprint import pprint
 
 
