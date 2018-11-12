@@ -13,8 +13,7 @@ import tkinter as tk
 Import src modules
 '''
 from src import SaveManager
-from src.view import TreeView
-from src.view import DirectoryView
+from src.view import TreeView, DirectoryView, MenuView
 from src.containers import AudioItem
 
 '''
@@ -71,6 +70,9 @@ class Application:
 
         # Create directory view (to select working/destination dirs)
         self.directoryView = DirectoryView.DirectoryView(self)
+
+        # Create a top menu bar
+        self.topMenu = MenuView.MenuView(self, self.master)
 
         self.saveManager = SaveManager.SaveManager(self)
 
