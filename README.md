@@ -4,7 +4,7 @@ DJade is my first python application and is used to help organize music into lab
 
 For now this is only compatible with .mp3 files but support for .wavs etc. will be added in the future.
 
-# What I've learnt
+## What I've learnt
 * Building graphical applications using TKinter
 * OS API for file manipulaion
 * Python getter/setters
